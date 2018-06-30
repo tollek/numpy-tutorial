@@ -88,6 +88,32 @@ def iterate(Z):
     Z[0,:] = Z[-1,:] = Z[:,0] = Z[:,-1] = 0
     return Z
 
+def iterate2(Z):
+    N = compute_neighbours(Z)
+    # dying from loneliness
+    R1 = (Z == 1) & (N < 2)
+    # dying from overcrowding
+    R2 = (Z == 1) & (N > 3)
+    # # survives
+    R3 = (Z == 1) & ((N == 2) | (N == 3))
+    # # creates new cell
+    R4 = (Z == 0) & (N == 3)
+
+    # update according to the rules
+    Z[R1 | R2] = 0
+    Z[R3 | R4] = 1
+    # clean the boundaries
+    Z[0,:] = Z[-1,:] = Z[:,0] = Z[:,-1] = 0
+    return Z
+
+def iterate3(Z):
+    N = compute_neighbours(Z)
+    N = N[1:-1, 1:-1]
+    birth = (N == 3) & (Z[1:-1, 1:-1] == 0)
+    survive = ((N == 2) | (N == 3)) & (Z[1:-1, 1:-1] == 1)
+    Z[...] = 0
+    Z[1:-1, 1:-1][birth | survive] = 1
+    return Z
 
 
 pretty = True
@@ -96,5 +122,5 @@ show(Z, pretty)
 for i in range(4):
     print('-------------')
     print (i)
-    Z = iterate(Z)
+    Z = iterate2(Z)
     show(Z, pretty)
